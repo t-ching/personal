@@ -27,7 +27,7 @@ def main(page: ft.Page):
     txt_p3 = ft.TextField(label="Player 3", width=85, value="P3")
     txt_p4 = ft.TextField(label="Player 4", width=85, value="P4")
 
-    lbl_setup_error = ft.Text(value="", color=ft.Colors.RED_ACCENT)
+    lbl_setup_error = ft.Text(value="", color=ft.Colors.RED_ACCENT, visible=False)
 
     def update_all_calculated_fields():
         try:
@@ -122,6 +122,7 @@ def main(page: ft.Page):
 
         if not (txt_p1.value and txt_p2.value and txt_p3.value and txt_p4.value):
             lbl_setup_error.value = "Please fill in all player names!"
+            lbl_setup_error.visible=True
             page.update()
             return
 
@@ -132,16 +133,19 @@ def main(page: ft.Page):
                     has_at_least_one_level = True
                     if not level_name_inputs[i].value.strip():
                         lbl_setup_error.value = f"Please enter a name for Row {i}!"
+                        lbl_setup_error.visible = True
                         page.update()
                         return
                     int(level_score_inputs[i].value)
         except ValueError:
             lbl_setup_error.value = "Active score fields must contain valid numbers!"
+            lbl_setup_error.visible = True
             page.update()
             return
 
         if not has_at_least_one_level:
             lbl_setup_error.value = "You must select at least one level to play!"
+            lbl_setup_error.visible = True
             page.update()
             return
 
@@ -315,6 +319,8 @@ def main(page: ft.Page):
             ft.Text("   全銃", width=90, size=14, weight=ft.FontWeight.BOLD),
         ], alignment=ft.MainAxisAlignment.CENTER),
         ft.Column(level_rows_list, spacing=5, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+        ft.Text("Only uncheck top/bottom boxes.", color=ft.Colors.OUTLINE,
+                width=330),
         lbl_setup_error,
         ft.Button("Start Scorekeeping", on_click=start_game, bgcolor=ft.Colors.GREEN, color=ft.Colors.WHITE)
     )
