@@ -1,8 +1,7 @@
 import flet as ft
 
-
 def main(page: ft.Page):
-    page.title = "Mahjong Score Tracker"
+    page.title = "Mahjong Scorekeeping"
     page.vertical_alignment = ft.MainAxisAlignment.START
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.scroll = ft.ScrollMode.AUTO
@@ -18,6 +17,9 @@ def main(page: ft.Page):
     level_score_inputs = {}
     level_double_displays = {}
     round_history_data = []
+    # level_rows = {}
+
+    levels = [1, 2, 3, 4, 5, 6, 7, 10, 13]
 
     # --- SCREEN 1: SETUP CONTROLS ---
     txt_p1 = ft.TextField(label="Player 1", width=85, value="P1")
@@ -30,25 +32,17 @@ def main(page: ft.Page):
     def update_all_calculated_fields():
         try:
             current_value = int(level_score_inputs[1].value)
-            for i in range(2, 9):
-                current_value = current_value * 2
-                level_score_inputs[i].value = str(current_value)
+            for i in range(2, 10):
+                level_score_inputs[i].value = str(int(level_score_inputs[i-1].value) * 2)
         except ValueError:
             pass
 
-        for i in range(1, 9):
+        for i in range(1, 10):
             try:
-                base_val = int(level_score_inputs[i].value)
-                level_double_displays[i].value = str(base_val * 2)
+                level_double_displays[i].value = str(int(level_score_inputs[i].value) * 2)
             except ValueError:
                 level_double_displays[i].value = ""
         page.update()
-
-    def on_level_1_change(e):
-        update_all_calculated_fields()
-
-    def on_other_score_change(e):
-        update_all_calculated_fields()
 
     def toggle_level_active(e):
         for i, chk in level_checkboxes.items():
@@ -56,19 +50,24 @@ def main(page: ft.Page):
                 level_name_inputs[i].disabled = not chk.value
                 level_score_inputs[i].disabled = not chk.value
                 level_double_displays[i].disabled = not chk.value
+                # level_rows[i].update()
                 break
         page.update()
 
     level_rows_list = []
-    for i in range(1, 9):
-        chk_box = ft.Checkbox(value=True, on_change=toggle_level_active)
-        name_field = ft.TextField(value=f"{i} 番", width=90, dense=True)
+    for i, fann in enumerate(levels, start=1):
+        # chk_box = ft.Checkbox(value=True, on_change=toggle_level_active)
+        chk_box = ft.Checkbox(value=True)
+        name_field = ft.TextField(value=f"{fann} 番", width=90, dense=True)
         score_field = ft.TextField(
-            value="10" if i == 1 else "",
+            value="1" if i == 1 else "",
             keyboard_type=ft.KeyboardType.NUMBER,
             width=90,
             dense=True,
-            on_change=on_level_1_change if i == 1 else on_other_score_change
+            on_change=update_all_calculated_fields if i == 1 else None,
+            read_only = i > 1,
+            bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST if i > 1 else None,
+            color=ft.Colors.OUTLINE if i > 1 else None
         )
 
         double_field = ft.TextField(
@@ -81,9 +80,12 @@ def main(page: ft.Page):
         level_score_inputs[i] = score_field
         level_double_displays[i] = double_field
 
-        level_rows_list.append(ft.Row([
+        row_instance = ft.Row([
             chk_box, name_field, ft.Text(":"), score_field, double_field
-        ], alignment=ft.MainAxisAlignment.CENTER))
+        ], alignment=ft.MainAxisAlignment.CENTER)
+
+        # level_rows[i] = row_instance
+        level_rows_list.append(row_instance)
 
     update_all_calculated_fields()
 
@@ -91,9 +93,9 @@ def main(page: ft.Page):
     lbl_round = ft.Text(value="Round 1", size=24, weight=ft.FontWeight.BOLD)
     scoreboard_container = ft.Column(spacing=10, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
 
-    drp_winner = ft.Dropdown(label="贏家", width=110)
+    drp_winner = ft.Dropdown(label="贏家", width=100)
     drp_level_achieved = ft.Dropdown(label="番數", width=110)
-    drp_winning_method = ft.Dropdown(label="自摸/出銃", width=110)
+    drp_winning_method = ft.Dropdown(label="自摸/出銃", width=150)
     lbl_game_error = ft.Text(value="", color=ft.Colors.RED_ACCENT, weight=ft.FontWeight.BOLD)
 
     history_list_view = ft.ListView(spacing=5, padding=10, height=140, auto_scroll=True)
@@ -125,7 +127,7 @@ def main(page: ft.Page):
 
         has_at_least_one_level = False
         try:
-            for i in range(1, 9):
+            for i in range(1, 10):
                 if level_checkboxes[i].value:
                     has_at_least_one_level = True
                     if not level_name_inputs[i].value.strip():
@@ -153,7 +155,7 @@ def main(page: ft.Page):
         current_round = 1
         round_history_data.clear()
         history_list_view.controls.clear()
-        lbl_round.value = "Round 1"
+        lbl_round.value = "Round 0"
 
         page.controls.clear()
 
@@ -170,7 +172,7 @@ def main(page: ft.Page):
 
         dropdown_options = []
         first_valid_key = None
-        for i in range(1, 9):
+        for i in range(1, 10):
             if level_checkboxes[i].value:
                 dropdown_options.append(ft.dropdown.Option(key=str(i), text=level_name_inputs[i].value))
                 if first_valid_key is None:
@@ -226,7 +228,7 @@ def main(page: ft.Page):
         level_name = level_name_inputs[chosen_index].value
 
         if winner == method:
-            lbl_game_error.value = f"Error: {winner} cannot pay themselves! Select another winning method."
+            lbl_game_error.value = f"Error: {winner} cannot pay themselves! Select another option."
             page.update()
             return
 
@@ -258,8 +260,8 @@ def main(page: ft.Page):
             ft.Text(history_text, size=13, color=ft.Colors.ON_SURFACE_VARIANT)
         )
 
-        current_round += 1
         lbl_round.value = f"Round {current_round}"
+        current_round += 1
         update_score_display()
         page.update()
 
