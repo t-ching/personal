@@ -189,6 +189,10 @@ def main(page: ft.Page):
         update_score_display()
 
         page.add(
+            ft.Row([ft.Button("← Back to Setup and RESET ALL", on_click=show_setup_screen,
+                              bgcolor=ft.Colors.RED, color=ft.Colors.WHITE)
+                              # bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST, color=ft.Colors.ON_SURFACE)
+                    ], alignment = ft.MainAxisAlignment.CENTER),
             ft.Card(content=ft.Container(content=ft.Column([
                 lbl_round, scoreboard_container,
             ], horizontal_alignment=ft.CrossAxisAlignment.CENTER), padding=20)),
@@ -199,7 +203,7 @@ def main(page: ft.Page):
             ft.Row([
                 ft.Button("Submit", on_click=submit_round, bgcolor=ft.Colors.BLUE, color=ft.Colors.WHITE),
                 ft.Button("Undo Last", on_click=undo_round, bgcolor=ft.Colors.ORANGE, color=ft.Colors.WHITE),
-                ft.Button("Reset", on_click=reset_game, bgcolor=ft.Colors.RED, color=ft.Colors.WHITE),
+                # ft.Button("Reset", on_click=reset_game, bgcolor=ft.Colors.RED, color=ft.Colors.WHITE),
             ], alignment=ft.MainAxisAlignment.CENTER, spacing=10),
             ft.Divider(),
             ft.Text("Game History Log", size=16, weight=ft.FontWeight.W_500),
@@ -307,23 +311,29 @@ def main(page: ft.Page):
         page.update()
 
     # --- INITIAL SETUP SCREEN LAYOUT ---
-    page.add(
-        ft.Text("Score Setup", size=22, weight=ft.FontWeight.BOLD),
-        ft.Row([txt_p1, txt_p2, txt_p3, txt_p4], alignment=ft.MainAxisAlignment.CENTER, spacing=10),
-        ft.Divider(),
-        ft.Row([
-            ft.Text("", width=40),
-            ft.Text("   Config", width=90, size=14, weight=ft.FontWeight.BOLD),
-            ft.Text(":"),
-            ft.Text("   自摸每人", width=90, size=14, weight=ft.FontWeight.BOLD),
-            ft.Text("   全銃", width=90, size=14, weight=ft.FontWeight.BOLD),
-        ], alignment=ft.MainAxisAlignment.CENTER),
-        ft.Column(level_rows_list, spacing=5, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
-        ft.Text("Only uncheck top/bottom boxes.", color=ft.Colors.OUTLINE,
-                width=330),
-        lbl_setup_error,
-        ft.Button("Start Scorekeeping", on_click=start_game, bgcolor=ft.Colors.GREEN, color=ft.Colors.WHITE)
-    )
+    def show_setup_screen(e=None):
+        page.controls.clear()
+        lbl_setup_error.visible = False  # Reset error text visibility on return
+        page.add(
+            ft.Text("Score Setup", size=22, weight=ft.FontWeight.BOLD),
+            ft.Row([txt_p1, txt_p2, txt_p3, txt_p4], alignment=ft.MainAxisAlignment.CENTER, spacing=10),
+            ft.Divider(),
+            ft.Row([
+                ft.Text("", width=40),
+                ft.Text("   Config", width=90, size=14, weight=ft.FontWeight.BOLD),
+                ft.Text(":"),
+                ft.Text("   自摸每人", width=90, size=14, weight=ft.FontWeight.BOLD),
+                ft.Text("   全銃", width=90, size=14, weight=ft.FontWeight.BOLD),
+            ], alignment=ft.MainAxisAlignment.CENTER),
+            ft.Column(level_rows_list, spacing=5, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+            ft.Text("Only uncheck top/bottom boxes.", color=ft.Colors.OUTLINE,
+                    width=330),
+            lbl_setup_error,
+            ft.Button("Start Scorekeeping", on_click=start_game, bgcolor=ft.Colors.GREEN, color=ft.Colors.WHITE)
+        )
+        page.update()
 
+    # Call the setup screen initially to display it when the app starts
+    show_setup_screen()
 
 ft.run(main)
