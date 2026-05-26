@@ -214,7 +214,8 @@ def main(page: ft.Page):
                 bgcolor=ft.Colors.SURFACE_CONTAINER_LOW,
                 width=550,
                 height=160
-            )
+            ),
+            ft.Text("© 2026 Mahjong Scorekeeper v1.0. All rights reserved.", size=12, color=ft.Colors.OUTLINE)
         )
         page.update()
 
@@ -326,10 +327,11 @@ def main(page: ft.Page):
                 ft.Text("   全銃", width=90, size=14, weight=ft.FontWeight.BOLD),
             ], alignment=ft.MainAxisAlignment.CENTER),
             ft.Column(level_rows_list, spacing=5, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
-            ft.Text("Only uncheck top/bottom boxes.", color=ft.Colors.OUTLINE,
-                    width=330),
+            ft.Text("Only uncheck top/bottom boxes.", color=ft.Colors.OUTLINE, width=330),
             lbl_setup_error,
-            ft.Button("Start Scorekeeping", on_click=start_game, bgcolor=ft.Colors.GREEN, color=ft.Colors.WHITE)
+            ft.Button("Start Scorekeeping", on_click=start_game, bgcolor=ft.Colors.GREEN, color=ft.Colors.WHITE),
+            ft.Text(""),
+            ft.Text("© 2026 Mahjong Scorekeeper v1.0. All rights reserved.", size=12, color=ft.Colors.OUTLINE)
         )
         page.update()
 
